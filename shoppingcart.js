@@ -5,6 +5,7 @@ const templateCard = document.getElementById('template-card').content;
 const templateFooter = document.getElementById('template-footer').content;
 const templateTrolley = document.getElementById('template-carrito').content;
 const fragment = document.createDocumentFragment();
+const contShoppingCart = document.getElementById('cont-shopping-cart');
 
 let shoppingCart = {};
 
@@ -51,10 +52,8 @@ const paintCards = data => {
 
 }
 const addTrolley = e => {
-
     e.target.classList.contains('btn-dark') ? setShoppingCart(e.target.parentElement) : false;
     e.stopPropagation()
-
 }
 const setShoppingCart = objeto => {
 
@@ -66,8 +65,9 @@ const setShoppingCart = objeto => {
         cantidad: 1
     }
 
-    shoppingCart.hasOwnProperty(product.id) ? product.cantidad = shoppingCart[product.id].cantidad + 1 : false;
-    shoppingCart[product.id] = { ...product };
+    if (shoppingCart.hasOwnProperty(product.id)) {
+        product.cantidad = shoppingCart[product.id].cantidad + 1;
+    } shoppingCart[product.id] = { ...product };
     paintTrolley();
 
 }
@@ -102,9 +102,9 @@ const paintFooter = () => {
         return
     }
     const nAmount = Object.values(shoppingCart).reduce((acc, { cantidad }) => acc + cantidad, 0);
-
     const nPrice = Object.values(shoppingCart).reduce((acc, { cantidad, precio }) => acc + cantidad * precio, 0);
     templateFooter.querySelectorAll('td')[0].textContent = nAmount;
+    contShoppingCart.innerHTML = nAmount;
     templateFooter.querySelector('span').textContent = nPrice;
     const clone = templateFooter.cloneNode(true);
     fragment.appendChild(clone);
@@ -126,6 +126,7 @@ const paintFooter = () => {
                     'Su carrito de compras esta vacio.',
                     'success'
                 )
+                contShoppingCart.innerHTML = 0;
                 shoppingCart = {};
                 paintTrolley();
             }
@@ -144,7 +145,6 @@ const btnAction = e => {
     if (e.target.classList.contains('btn-danger')) {
         const product = shoppingCart[e.target.dataset.id];
         product.cantidad--;
-
         product.cantidad === 0 ? delete shoppingCart[e.target.dataset.id] : false;
         paintTrolley()
     }
